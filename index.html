@@ -3278,7 +3278,7 @@ body[data-theme^="tema"] #examCheatBanner{
   <!-- T5: Latihan -->
   <section class="panel" id="t5">
     <h2>✍️ Latihan</h2>
-    <p class="small">Pilih latihan per topik atau latihan campuran. Setiap sesi pilihan ganda berisi 15 soal dengan komposisi tingkat kesulitan yang seimbang.</p>
+    <p class="small">Pilih latihan per topik atau latihan campuran. Setiap sesi pilihan ganda berisi 15 soal. Sistem mengupayakan komposisi 5 soal mudah, 7 sedang, dan 3 sulit, serta mengambil soal dari subtopik yang tersedia secara bergiliran.</p>
     <div class="card hl"><h3>🌐 0. Latihan Campuran Semua Topik</h3><p class="small">15 soal dengan sebaran dari ketiga kelompok materi. Target komposisi: 5 mudah, 7 sedang, dan 3 sulit.</p><button class="btn purple" data-start-topic="campuran">🚀 Mulai Latihan Campuran (15 soal)</button></div>
     <div class="card hl"><h3>📘 1. Latihan Pengertian, Notasi, Ordo, Jenis, Transpos &amp; Kesamaan</h3><p class="small" id="tcCountA">📚 Memuat...</p><button class="btn purple" data-start-topic="topikA">🚀 Mulai Latihan (15 soal)</button></div>
     <div class="card hl"><h3>➕ 2. Latihan Operasi Matriks (Tambah, Kurang, Kali)</h3><p class="small" id="tcCountB">📚 Memuat...</p><button class="btn purple" data-start-topic="topikB">🚀 Mulai Latihan (15 soal)</button></div>
@@ -3631,244 +3631,12 @@ function shuffleOptions(q) {
 
 /* FUNGSI Q YANG SEBELUMNYA HILANG */
 
-function rapikanTeksSoal(teks) {
-  var q = String(teks || '').trim();
-
-  var aturan = [
-    [/^Matriks kolom berordo\s*\.\.\.$/i,
-      'Suatu matriks yang hanya memiliki satu kolom disebut matriks kolom. Ordo yang tepat untuk matriks kolom adalah ...'],
-    [/^Matriks identitas 3 ?× ?3 adalah\s*\.\.\.$/i,
-      'Matriks identitas berordo 3 × 3 memiliki elemen 1 pada diagonal utama dan 0 pada posisi lainnya. Bentuk matriks yang tepat adalah ...'],
-    [/^Manakah matriks simetris\?$/i,
-      'Di antara matriks pada pilihan jawaban, manakah yang merupakan matriks simetris, yaitu matriks yang sama dengan transposnya?'],
-    [/^Jika A simetris, maka\s*\.\.\.$/i,
-      'Jika A merupakan matriks simetris, hubungan yang harus dipenuhi antara matriks A dan transposnya adalah ...'],
-    [/^Sifat \(A \+ B\)\s*[tTᵀ]\s*=\s*\.\.\.$/i,
-      'Jika A dan B memiliki ordo yang sama, manakah sifat transpos yang benar untuk penjumlahan A + B?'],
-    [/^Dua matriks sama jika\s*\.\.\.$/i,
-      'Dua matriks dikatakan sama apabila memenuhi syarat kesamaan ordo dan kesamaan setiap elemen yang seletak, yaitu ...'],
-    [/^Sifat distributif skalar\s*\.\.\.$/i,
-      'Manakah persamaan yang menunjukkan sifat distributif perkalian skalar terhadap penjumlahan dua matriks?'],
-    [/^Umumnya, AB dan BA\s*\.\.\.$/i,
-      'Dalam perkalian matriks, bagaimana hubungan hasil AB dan BA pada umumnya?'],
-    [/^Umumnya AB\s*\.\.\.\s*BA\.?$/i,
-      'Dalam perkalian matriks, apakah hasil AB selalu sama dengan BA?'],
-    [/^Sifat transpos hasil perkalian\s*\.\.\.$/i,
-      'Manakah hubungan yang benar antara transpos hasil perkalian dua matriks dan perkalian transpos kedua matriks tersebut?'],
-    [/^Sifat distributif\s*\.\.\.$/i,
-      'Manakah persamaan yang menunjukkan sifat distributif perkalian matriks terhadap penjumlahan matriks?'],
-    [/^Lawan dari A adalah\s*\.\.\.$/i,
-      'Jika A merupakan suatu matriks, manakah bentuk matriks lawan (invers penjumlahan) dari A?'],
-    [/^Sifat determinan hasil kali\s*\.\.\.$/i,
-      'Bagaimana hubungan determinan hasil kali dua matriks persegi dengan determinan masing-masing matriks?'],
-    [/^Sifat invers hasil kali\s*\.\.\.$/i,
-      'Jika A dan B merupakan matriks persegi yang memiliki invers, manakah rumus yang benar untuk invers hasil kali AB?'],
-    [/^Ordo matriks\s+/i,
-      'Perhatikan matriks berikut. Tentukan ordo dari matriks '],
-
-    [/^Elemen\s+([a-zA-Z](?:<sub>\s*\d+\s*<\/sub>|[₀-₉0-9]+)?)\s+dari\s+/i,
-      'Perhatikan matriks berikut. Tentukan nilai elemen $1 dari matriks '],
-
-    [/^det\s+/i,
-      'Tentukan nilai determinan dari matriks '],
-
-    [/^Invers I 3 ?× ?3 adalah\s*\.\.\.$/i,
-      'Diketahui matriks identitas I berordo 3 × 3. Manakah pernyataan yang benar tentang invers matriks I?'],
-    [/^Invers matriks identitas adalah\s*\.\.\.$/i,
-      'Diketahui I merupakan matriks identitas. Matriks apakah yang menjadi invers dari I?'],
-    [/^Invers matriks diagonal adalah\s*\.\.\.$/i,
-      'Jika suatu matriks diagonal memiliki seluruh elemen diagonal utama tidak sama dengan nol, bagaimana bentuk invers matriks tersebut?'],
-    [/^Invers\s+/i,
-      'Tentukan invers dari '],
-
-    [/^Transpose\s+/i,
-      'Tentukan transpos dari matriks '],
-
-        [/^Rumus det 2 × 2.*/i,
-      'Rumus yang tepat untuk menentukan determinan matriks persegi berordo 2 × 2 adalah ...'],
-
-    [/^Rumus invers 2 × 2.*/i,
-      'Manakah rumus yang tepat untuk menentukan invers matriks persegi berordo 2 × 2?'],
-
-    [/^Rumus invers 3 × 3.*/i,
-      'Manakah rumus yang tepat untuk menentukan invers matriks persegi berordo 3 × 3?'],
-
-    [/^Sarrus untuk matriks berordo.*/i,
-      'Metode Sarrus dapat digunakan untuk menghitung determinan matriks berordo ...'],
-
-    [/^Matriks diagonal, det/i,
-      'Jika suatu matriks merupakan matriks diagonal, bagaimana cara menentukan nilai determinannya?'],
-
-    [/^Matriks punya invers jika/i,
-      'Suatu matriks persegi memiliki invers apabila memenuhi syarat ...'],
-
-    [/^Jika det = 0, matriks disebut/i,
-      'Jika nilai determinan suatu matriks persegi sama dengan nol, matriks tersebut disebut ...'],
-
-    [/^Jika det\(A\) = 0 maka A/i,
-      'Jika determinan matriks persegi A sama dengan nol, kesimpulan yang tepat adalah ...'],
-
-    [/^Syarat 3 × 3 punya invers/i,
-      'Agar matriks persegi berordo 3 × 3 memiliki invers, syarat yang harus dipenuhi adalah ...'],
-
-    [/^Adjoin adalah/i,
-      'Dalam materi invers matriks, apakah yang dimaksud dengan matriks adjoin?'],
-
-    [/^Tanda kofaktor C/i,
-      'Dalam perhitungan determinan matriks, rumus tanda untuk menentukan kofaktor Cij adalah ...'],
-
-        [/^Rumus kofaktor C.*/i,
-      'Rumus yang digunakan untuk menentukan kofaktor Cij dari suatu matriks adalah ...'],
-
-    [/^Sifat penjumlahan matriks/i,
-      'Manakah pernyataan yang benar mengenai sifat penjumlahan dua matriks?'],
-
-    [/^Sifat asosiatif perkalian/i,
-      'Manakah bentuk persamaan yang menunjukkan sifat asosiatif pada perkalian matriks?'],
-
-    [/^Sifat identitas perkalian matriks/i,
-      'Bagaimana sifat perkalian suatu matriks persegi dengan matriks identitas yang berordo sama?'],
-
-    [/^Sifat penjumlahan dengan matriks nol/i,
-      'Bagaimana hasil penjumlahan suatu matriks dengan matriks nol yang berordo sama?'],
-
-    [/^Sifat transpos hasil perkalian/i,
-      'Manakah hubungan yang benar antara transpos hasil perkalian dua matriks dan perkalian transpos kedua matriks tersebut?'],
-
-    [/^Sifat distributif skalar/i,
-      'Bagaimana sifat distributif perkalian skalar terhadap penjumlahan dua matriks?'],
-
-    [/^Sifat distributif/i,
-      'Manakah persamaan yang menunjukkan sifat distributif dalam operasi matriks?'],
-
-    [/^Sifat determinan hasil kali/i,
-      'Bagaimana hubungan determinan hasil kali dua matriks persegi dengan determinan masing-masing matriks?'],
-
-    [/^Sifat invers hasil kali/i,
-      'Bagaimana rumus invers dari hasil kali dua matriks yang keduanya memiliki invers?'],
-
-    [/^Lawan dari A adalah/i,
-      'Jika A merupakan suatu matriks, matriks apakah yang disebut sebagai lawan atau invers penjumlahan dari A?'],
-
-    [/^Syarat perkalian A·B/i,
-      'Agar perkalian matriks A × B dapat dilakukan, syarat kesesuaian ordo yang harus dipenuhi adalah ...'],
-
-    [/^Ordo hasil kali matriks\s*(.*)$/i,
-      'Diketahui ordo dua matriks sebagai berikut: $1. Tentukan ordo hasil perkaliannya.'],
-
-    [/^Ordo\s+\((.*)$/i,
-      'Diketahui operasi perkalian matriks berikut: ($1. Tentukan ordo hasilnya.'],
-
-    [/^I · A =/i,
-      'Jika A merupakan matriks persegi dan I adalah matriks identitas dengan ordo yang sama, tentukan hasil perkalian I × A.'],
-
-    [/^A · I =/i,
-      'Jika A merupakan matriks persegi dan I adalah matriks identitas dengan ordo yang sama, tentukan hasil perkalian A × I.'],
-
-    [/^Umumnya, AB dan BA/i,
-      'Dalam operasi perkalian matriks, apakah hasil perkalian A × B selalu sama dengan B × A?'],
-
-    [/^Umumnya AB/i,
-      'Bagaimana hubungan antara hasil perkalian A × B dan B × A secara umum?'],
-
-    [/^Matriks tanpa invers disebut/i,
-      'Matriks persegi yang tidak memiliki invers disebut sebagai ...'],
-
-    [/^Matriks baris adalah/i,
-      'Berdasarkan jumlah baris dan kolomnya, apakah yang dimaksud dengan matriks baris?'],
-
-    [/^Matriks kolom berordo/i,
-      'Jika suatu matriks hanya memiliki satu kolom dan n baris, bagaimana ordo matriks tersebut dinyatakan?'],
-
-    [/^Matriks berordo/i,
-      'Jika suatu matriks memiliki ordo seperti yang disebutkan, berapa banyak elemen yang terdapat di dalamnya?'],
-
-    [/^Ciri matriks diagonal/i,
-      'Manakah karakteristik yang harus dipenuhi oleh suatu matriks agar disebut matriks diagonal?'],
-
-    [/^Ciri matriks simetris/i,
-      'Manakah karakteristik yang menunjukkan bahwa suatu matriks merupakan matriks simetris?'],
-
-    [/^Matriks segitiga atas memiliki ciri/i,
-      'Suatu matriks persegi disebut matriks segitiga atas apabila memenuhi karakteristik ...'],
-
-    [/^Matriks segitiga bawah memiliki ciri/i,
-      'Suatu matriks persegi disebut matriks segitiga bawah apabila memenuhi karakteristik ...'],
-
-    [/^Matriks simetris memenuhi syarat/i,
-      'Suatu matriks persegi disebut simetris apabila hubungan antara matriks dan transposnya memenuhi ...'],
-
-    [/^Matriks skalar adalah/i,
-      'Manakah pernyataan yang tepat untuk menjelaskan karakteristik matriks skalar?'],
-
-    [/^Matriks persegi adalah/i,
-      'Berdasarkan jumlah baris dan kolom, suatu matriks disebut matriks persegi apabila ...'],
-
-    [/^Matriks nol berordo/i,
-      'Jika suatu matriks berordo seperti yang disebutkan merupakan matriks nol, bagaimana nilai seluruh elemennya?'],
-
-    [/^Matriks identitas/i,
-      'Manakah bentuk matriks yang memenuhi karakteristik matriks identitas?'],
-
-    [/^Diagonal utama matriks/i,
-      'Perhatikan matriks berikut. Tentukan elemen-elemen yang terletak pada diagonal utamanya.'],
-
-    [/^Jika dua garis sejajar/i,
-      'Dalam suatu sistem persamaan linear dua variabel, jika kedua garis saling sejajar dan tidak berimpit, bagaimana nilai determinan matriks koefisiennya?'],
-
-    [/^Secara geometris/i,
-      'Bagaimana interpretasi geometris dari solusi suatu sistem persamaan linear dua variabel pada bidang koordinat?'],
-
-    [/^A · A⁻¹ =/i,
-      'Jika matriks A memiliki invers, tentukan hasil perkalian matriks A dengan inversnya, yaitu ...'],
-
-    [/^Total belanja/i,
-      'Seseorang membeli barang dengan jumlah dan harga satuan seperti yang disebutkan. Berapakah total biaya yang harus dibayarkan?'],
-
-    [/^Jika det =/i,
-      'Diketahui nilai determinan suatu matriks dan informasi lain seperti pada soal. Tentukan hasil yang diminta.'],
-
-    [/^Untuk dua matriks A dan B, berlaku\s*\.\.\.$/i,
-      'Jika A dan B merupakan matriks yang dapat dikalikan, hubungan antara transpos hasil kali AB dan transpos masing-masing matriks dinyatakan oleh ...'],
-
-    [/^Sifat \(A \+ B\)<sup>t<\/sup>\s*=\s*\.\.\.$/i,
-      'Jika A dan B memiliki ordo yang sama, hubungan transpos dari penjumlahan A + B dengan transpos masing-masing matriks adalah ...'],
-
-    [/^Sifat \(kl\)·A\s*=\s*\.\.\.$/i,
-      'Untuk skalar k dan l serta matriks A, persamaan yang menunjukkan sifat asosiatif perkalian skalar terhadap matriks adalah ...'],
-
-    [/^Sifat transpos yang benar\s*\.\.\.$/i,
-      'Manakah persamaan yang menunjukkan sifat transpos dari hasil perkalian dua matriks A dan B?'],
-
-    [/^A 3×3 det=0, maka\s*\.\.\.$/i,
-      'Diketahui matriks persegi A berordo 3 × 3 dengan det(A) = 0. Kesimpulan yang tepat mengenai invers matriks A adalah ...']
-  ];
-
-
-  // Mempertahankan nama elemen yang ditanyakan.
-  var elemenMatch = q.match(/^Elemen\s+([a-zA-Z]₍?[\w₁₂₃₄₅₆₇₈₉₀]*?)\s+dari\s+/i);
-
-  if (elemenMatch) {
-    q = q.replace(
-      /^Elemen\s+([a-zA-Z][\w₀₁₂₃₄₅₆₇₈₉₀]*)\s+dari\s+/i,
-      'Perhatikan matriks berikut. Tentukan nilai elemen $1 dari '
-    );
-  }
-
-
-  for (var i = 0; i < aturan.length; i++) {
-    if (aturan[i][0].test(q)) {
-      q = q.replace(aturan[i][0], aturan[i][1]);
-      break;
-    }
-  }
-
-  return q;
-}
+/* Redaksi soal ditampilkan persis seperti yang ditulis pada bank soal.
+   Tidak ada lagi aturan yang mengubah atau menambahkan kalimat secara otomatis. */
 
 function Q(qText, options, answerIndex, explanation, type) {
   return {
-    q: rapikanTeksSoal(qText),
+    q: String(qText || '').trim(),
     o: options,
     a: answerIndex,
     e: explanation,
@@ -5630,7 +5398,6 @@ Q('Dalam menentukan invers matriks persegi berordo 3 × 3, kita dapat menggunaka
   'det(A) · adj(A)',
   '<span class="math-frac"><span>1</span><span>det A</span></span> · A<sup>t</sup>'
 ], 0, 'Rumus invers matriks 3×3 adalah A⁻¹ = (1/det A) · adj(A), dengan adj(A) adalah transpose dari matriks kofaktor A.', 'biasa'),
-    Q('Invers I 3 × 3 adalah ...', ['I itu sendiri', 'O', '3I', 'tidak ada', 'A<sup>t</sup>'], 0, 'Invers dari matriks identitas I adalah I itu sendiri, karena I · I = I.', 'biasa'),
     Q('Invers matriks diagonal adalah ...', ['diagonal dengan 1/dᵢ', 'diagonal dengan dᵢ', 'diagonal dengan −dᵢ', 'matriks nol', 'tidak ada'], 0, 'Untuk matriks diagonal, invers diperoleh dengan membalik setiap elemen diagonalnya, yaitu 1/dᵢ, asalkan semua dᵢ ≠ 0.', 'biasa'),
     Q('Diketahui matriks persegi A memiliki det(A) = 0. Kesimpulan yang tepat mengenai invers matriks A adalah ....', ['tidak punya invers', 'punya invers', '= I', '= O', 'simetris'], 0, 'Jika det(A) = 0, matriks A disebut singular dan tidak memiliki invers. Ini karena rumus invers membutuhkan pembagian dengan det(A).', 'biasa'),
     Q('Dalam ekspansi kofaktor, tanda yang menyertai minor pada posisi baris ke-i dan kolom ke-j ditentukan oleh rumus ....', ['(−1)<sup>i+j</sup>', '(i + j)', '(i − j)', 'i·j', '(−1)<sup>i</sup>'], 0, 'Tanda kofaktor mengikuti pola papan catur: Cᵢⱼ = (−1)^(i+j) · Mᵢⱼ. Pojok kiri atas bertanda positif (+).', 'biasa'),
@@ -5656,6 +5423,63 @@ Object.keys(QUIZ_BANK_STABLE_IDS).forEach(function(key){
   QUIZ_BANKS[key].forEach(function(question, index){ question.id = ids[index]; });
 });
 
+/* Penyuntingan redaksi manual untuk butir yang sebelumnya berupa fragmen.
+   Ini adalah teks tetap per butir, bukan aturan otomatis yang mengubah soal. */
+var REDAKSI_MANUAL_SOAL = {
+  C: {
+    10: 'Diketahui matriks A = '+mm([[1,2],[3,4]])+'. Tentukan transpos matriks A, yaitu Aᵀ.',
+    11: 'Jika matriks A berordo 2 × 5, tentukan ordo matriks transpos A (Aᵀ).',
+    12: 'Diketahui matriks A = '+mm([[1,2],[3,4]])+'. Tentukan elemen baris pertama dan kolom kedua dari matriks transpos A (Aᵀ).',
+    13: 'Manakah persamaan yang menyatakan sifat transpos suatu matriks dengan benar?',
+    14: 'Jika A dan B merupakan matriks yang dapat dijumlahkan, bagaimana hubungan transpos dari A + B dengan transpos masing-masing matriks?',
+    15: 'Diketahui matriks A = '+mm([[5,-1],[0,3]])+'. Tentukan transpos matriks A, yaitu Aᵀ.',
+    16: 'Jika matriks A berordo 3 × 4, tentukan ordo matriks transpos A (Aᵀ).',
+    17: 'Jika A merupakan matriks diagonal, bagaimana hubungan antara matriks A dan transposnya Aᵀ?',
+    18: 'Jika matriks A merupakan matriks simetris, hubungan apakah yang berlaku antara A dan Aᵀ?'
+  },
+  D: {
+    13: 'Diketahui persamaan dua matriks berikut: '+mm([['x+1',3],[4,'2y']])+' = '+mm([[5,3],[4,8]])+'. Tentukan nilai x dan y yang memenuhi kesamaan tersebut.',
+    14: 'Diketahui persamaan dua matriks berikut: '+mm([[2,'a'],['b',3]])+' = '+mm([[2,5],[-1,3]])+'. Tentukan nilai a dan b.',
+    15: 'Diketahui persamaan dua matriks berikut: '+mm([['x-2',3],[1,'y+1']])+' = '+mm([[4,3],[1,5]])+'. Tentukan nilai x dan y.',
+    16: 'Diketahui persamaan dua matriks berikut: '+mm([['2x',4],[6,'3y']])+' = '+mm([[8,4],[6,9]])+'. Tentukan nilai x dan y.',
+    17: 'Diketahui persamaan dua matriks berikut: '+mm([['x+y',5],[-1,'x-y']])+' = '+mm([[7,5],[-1,1]])+'. Tentukan nilai x dan y.',
+    18: 'Diketahui persamaan dua matriks berikut: '+mm([['3x-1',2],[4,'y']])+' = '+mm([[8,2],[4,-3]])+'. Tentukan nilai x dan y.',
+    20: 'Diketahui dua matriks berikut memiliki elemen-elemen yang bersesuaian sama: '+mm([['a',1],[0,'b']])+' = '+mm([[3,1],[0,-2]])+'. Tentukan nilai a dan b.',
+    21: 'Diketahui dua matriks berikut sama: '+mm([[2,5],['x',3]])+' = '+mm([[2,5],[7,3]])+'. Tentukan nilai x berdasarkan kesamaan elemen yang seletak.'
+  },
+  E1: {
+    11: 'Hitung hasil penjumlahan dua matriks berikut: '+mm([[1,2],[3,4]])+' + '+mm([[5,6],[7,8]])+'.',
+    12: 'Hitung hasil pengurangan matriks pertama dengan matriks kedua berikut: '+mm([[5,3],[2,1]])+' − '+mm([[1,1],[1,0]])+'.',
+    14: 'Hitung hasil penjumlahan dua matriks berikut: '+mm([[2,1],[0,3]])+' + '+mm([[-1,4],[2,1]])+'.',
+    15: 'Hitung hasil pengurangan matriks pertama dengan matriks kedua berikut: '+mm([[3,5],[1,2]])+' − '+mm([[1,2],[3,4]])+'.',
+    16: 'Hitung hasil penjumlahan dua matriks berikut: '+mm([[-2,3],[1,0]])+' + '+mm([[2,-3],[-1,0]])+'.',
+    17: 'Hitung hasil penjumlahan dua matriks berikut: '+mm([[4,1],[2,3]])+' + '+mm([[-1,2],[0,5]])+'.',
+    18: 'Hitung hasil penjumlahan matriks A dengan dirinya sendiri jika A = '+mm([[1,2],[3,4]])+'.',
+    19: 'Hitung hasil pengurangan matriks pertama dengan matriks kedua berikut: '+mm([[7,-1],[2,5]])+' − '+mm([[2,-1],[2,5]])+'.',
+    20: 'Hitung hasil penjumlahan dua matriks berikut: '+mm([[3,0],[0,3]])+' + '+mm([[-3,0],[0,-3]])+'.'
+  },
+  E2: {
+    10: 'Diberikan matriks A = '+mm([['a','b'],['c','d']])+'. Tuliskan hasil perkalian skalar 2 dengan matriks A, yaitu 2A.'
+  },
+  E3: {
+    29: 'Hitung hasil perkalian matriks berikut: '+mm([[2,0],[1,3]])+' × '+mm([[1,2],[0,1]])+'.',
+    33: 'Hitung hasil perkalian matriks berikut: '+mm([[1,2],[3,4]])+' × '+mm([[2,1],[1,2]])+'.',
+    34: 'Matriks pertama berordo 1 × 3 dan matriks kedua berordo 3 × 1. Tentukan ordo matriks hasil perkalian kedua matriks tersebut.',
+    35: 'Hitung hasil perkalian matriks berikut: '+mm([[2,3],[1,4]])+' × '+mm([[1,0],[2,1]])+'.'
+  },
+  H2: {
+    3: 'Manakah rumus yang tepat untuk menentukan invers matriks persegi berordo 3 × 3 dengan menggunakan determinan dan matriks adjoin?',
+    4: 'Jika suatu matriks diagonal memiliki semua elemen diagonal utama tidak nol, bagaimana cara menentukan invers matriks tersebut?',
+    7: 'Dalam metode adjoin untuk mencari invers matriks, bagaimana rumus untuk menentukan kofaktor Cᵢⱼ dari elemen pada baris ke-i dan kolom ke-j?'
+  }
+};
+Object.keys(REDAKSI_MANUAL_SOAL).forEach(function(key){
+  Object.keys(REDAKSI_MANUAL_SOAL[key]).forEach(function(number){
+    var index=Number(number)-1;
+    if(QUIZ_BANKS[key] && QUIZ_BANKS[key][index]) QUIZ_BANKS[key][index].q=REDAKSI_MANUAL_SOAL[key][number];
+  });
+});
+
 var BANK_MENGAPA=[
   Q('Mengapa penjumlahan matriks hanya menjumlahkan elemen seletak?',['Karena setiap posisi mewakili kategori yang sama','Karena aturan sembarang','Karena lebih mudah','Karena hasilnya kecil','Karena semua matriks sama'],0,'Penjumlahan matriks hanya menjumlahkan elemen seletak karena setiap posisi (baris, kolom) mewakili kategori yang sama. Misalnya, posisi (1,1) di kedua matriks mewakili data yang sama, sehingga baru bisa dijumlahkan.'),
   Q('Syarat perkalian dua matriks A·B adalah ...',['kolom A = baris B','baris A = kolom B','ordo sama','determinan sama','A = B'],0,'Perkalian A·B dapat dilakukan jika banyak kolom matriks A sama dengan banyak baris matriks B. Syarat ini muncul karena setiap elemen hasil adalah hasil kali titik antara baris A dan kolom B.'),
@@ -5678,7 +5502,11 @@ var BANK_SOAL={};
 Object.keys(TOPIC_MAP).forEach(function(tk){
   BANK_SOAL[tk]={judul:TOPIC_MAP[tk].judul, icon:TOPIC_MAP[tk].icon, soal:[]};
   TOPIC_MAP[tk].keys.forEach(function(k){
-    QUIZ_BANKS[k].forEach(function(q){ BANK_SOAL[tk].soal.push({id:q.id,q:q.q,o:q.o,a:q.a,e:q.e,t:q.t||'biasa',hots:q.hots===true,topic:tk,subtopic:k}); });
+    QUIZ_BANKS[k].forEach(function(q){
+      var entry={id:q.id,q:q.q,o:q.o,a:q.a,e:q.e,t:q.t||'biasa',hots:q.hots===true,topic:tk,subtopic:k};
+      entry.difficulty=classifyDifficulty(entry);
+      BANK_SOAL[tk].soal.push(entry);
+    });
   });
 });
 BANK_SOAL.topikA.soal.push(
@@ -6444,11 +6272,18 @@ var EXAM_CFG={
              allTopics:true, minStory:1, minHots:1}
 };
 function classifyExamTopic(q){
-  if(q && q.topic && BANK_SOAL[q.topic]) return q.topic;
+  // Bank topik utama menggunakan pemetaan subtopik yang eksplisit.
+  var sub=String(q&&q.subtopic||'').toUpperCase();
+  if(/^(A|B|C|D)$/.test(sub)) return 'topikA';
+  if(/^(E1|E2|E3)$/.test(sub)) return 'topikB';
+  if(/^(F|G1|G2|H1|H2)$/.test(sub)) return 'topikC';
+  if(q && ['topikA','topikB','topikC'].includes(q.topic)) return q.topic;
+
+  // Untuk bank tambahan, tentukan topik dari konsep yang benar-benar ditanyakan.
   var t=String(q&&q.q||'').toLowerCase().replace(/<[^>]*>/g,' ');
-  if(/determinan|determinan|\bdet\b|\binvers\b|singular|adjoin|kofaktor|minor|sarrus|trace|cayley|luas bayangan|nilai mutlak determinan/.test(t)) return 'topikC';
-  if(/transpos|transpose|simetris|ordo|baris|kolom|elemen|kesamaan|matriks identitas|matriks nol|matriks diagonal|matriks skalar|matriks baris|matriks kolom/.test(t) && !/perkalian matriks identitas|sifat identitas perkalian|a\s*[·.]\s*i|i\s*[·.]\s*a/.test(t)) return 'topikA';
-  if(/penjumlahan|pengurangan|perkalian|skalar|distributif|komutatif|asosiatif|hasil kali|ordo hasil|\bab\b|\bba\b|\b2a\b|\ba\s*[+−-]\s*b|\ba\s*[·.]\s*b/.test(t)) return 'topikB';
+  if(/determinan|\bdet\b|invers|singular|adjoin|kofaktor|minor|sarrus|trace|cayley|luas bayangan|nilai mutlak determinan/.test(t)) return 'topikC';
+  if(/perkalian|hasil kali|skalar|distributif|komutatif|asosiatif|\bab\b|\bba\b|\ba\s*[·.]\s*b|\ba\s*[+−-]\s*b|penjumlahan|pengurangan|selisih matriks|jumlah matriks/.test(t)) return 'topikB';
+  if(/transpos|transpose|simetris|ordo|baris|kolom|elemen|kesamaan|matriks identitas|matriks nol|matriks diagonal|matriks skalar|matriks baris|matriks kolom|jenis matriks/.test(t)) return 'topikA';
   return 'topikA';
 }
 function classifyDifficulty(q){
@@ -6457,10 +6292,64 @@ function classifyDifficulty(q){
     if(explicit==='mudah'||explicit==='sedang'||explicit==='sulit') return explicit;
   }
   var t=String(q&&q.q||'').toLowerCase().replace(/<[^>]*>/g,' ');
+  var sub=String(q&&q.subtopic||'').toUpperCase();
   var kind=String(q&&q.t||'').toLowerCase();
   if((q&&q.hots===true)||kind==='hots') return 'sulit';
-  if(/cayley|vandermonde|ortogonal|eigen|eigenvalue|nilai eigen|trace|rank|nilpoten|jordan|pernyataan\s*\(1\)|cukup untuk menjawab|\ba\s*\+\s*cb|\(ab\)\s*<sup>−1|a\s*\+\s*t\s*b|\ba\^?\s*\d{2,}|a²⁰²⁴|a\^\s*\d{2,}/i.test(t)) return 'sulit';
-  if(/3\s*[×x]\s*3|ordo\s*3\s*[×x]\s*3|metode sarrus|kofaktor|adjoin|determinan|\bdet\b|invers|singular|\bab\b|\bba\b|perkalian matriks|sistem persamaan|\bspl\b|nilai [a-z]\s*=|\b(x|y|a|b|m|n)\s*[+−-].*=|rotasi|luas bayangan|\|det\|/i.test(t)) return 'sedang';
+
+  // Klasifikasi bank inti mempertimbangkan banyaknya langkah dan konsep yang diperlukan.
+  if(sub==='A'){
+    if(/lebih banyak|dua kali|banyak seluruh elemennya|aturan pembentukan|elemen-elemen.*dijumlahkan|jumlah.*baris|selisih/.test(t)) return 'sedang';
+    return 'mudah';
+  }
+  if(sub==='B'){
+    if(/nilai\s+[a-z]\s*\+|nilai\s+x|nilai\s+y|skew|skew-simetris|simetris|syarat|hubungan/.test(t)) return 'sedang';
+    return 'mudah';
+  }
+  if(sub==='C'){
+    if(/\b(?:aa|bc|3a|a\s*\+\s*b|b\s*\^?t)\b|perkalian|persamaan|nilai\s+[a-z]|jumlah.*elemen/.test(t)) return 'sulit';
+    if(/ordo|elemen|nilai|transpos|transpose/.test(t)) return 'mudah';
+    return 'mudah';
+  }
+  if(sub==='D'){
+    if(/\^|²|invers|determinan|transpose|transpos|perkalian|hasil kali|\+\s*k\s*a|\bca\b|\bxy\b/.test(t)) return 'sulit';
+    if(/nilai|tentukan|x|y|a\s*\+\s*b|a\s*−\s*b|a\s*×\s*b/.test(t)) return 'sedang';
+    return 'mudah';
+  }
+  if(sub==='E1'){
+    if(/\bx\b|\by\b|\bz\b|nilai|persamaan|\+\s*2b|3a|transpos|transpose|kuantitas/.test(t)) return 'sedang';
+    return 'mudah';
+  }
+  if(sub==='E2'){
+    if(/pernyataan|cukup untuk menjawab|proyek|kontraktor|pabrik|nilai p|nilai p dan q|persamaan matriks/.test(t)) return 'sedang';
+    return 'mudah';
+  }
+  if(sub==='E3'){
+    if(/pangkat|perpangkatan|\^\s*\d{2,}|²⁰|2012|2016|2024|sistem persamaan|memenuhi|parameter|matriks a, b, dan c|\bka\b|\bk[a-z]\b/.test(t)) return 'sulit';
+    if(/ordo|syarat|dapat dilakukan|dapat dikalikan|ukuran/.test(t)) return 'mudah';
+    return 'sedang';
+  }
+  if(sub==='F'){
+    if(/invers hasil|determinan hasil|transpos hasil|hasil perkalian|dua matriks|syarat/.test(t)) return 'sedang';
+    return 'mudah';
+  }
+  if(sub==='G1'){
+    if(/nilai\s+[a-z]|parameter|diketahui\s+det|hubungan|luas bayangan|sistem persamaan/.test(t)) return 'sedang';
+    return 'mudah';
+  }
+  if(sub==='G2'){
+    if(/parameter|nilai\s+[a-z]|kofaktor|minor|adjoin|ekspansi|beberapa/.test(t)) return 'sulit';
+    return 'sedang';
+  }
+  if(sub==='H1'){
+    if(/identitas|rumus|syarat|disebut|tidak memiliki invers/.test(t)) return 'mudah';
+    if(/persamaan|memenuhi|hasil kali|pangkat|beberapa matriks|nilai\s+[a-z]/.test(t)) return 'sulit';
+    return 'sedang';
+  }
+  if(sub==='H2') return /identitas|diagonal|segitiga/.test(t) ? 'sedang' : 'sulit';
+
+  // Bank tambahan: aturan ini hanya dipakai jika soal tidak memiliki subtopik inti.
+  if(/cayley|eigen|rank|nilpoten|jordan|pangkat|perpangkatan|parameter|sistem persamaan|spl|beberapa tahap|kuantitas p dan q/.test(t)) return 'sulit';
+  if(/3\s*[×x]\s*3|ordo\s*3|determinan|\bdet\b|invers|adjoin|kofaktor|minor|sarrus|perkalian matriks|hasil kali|matriks simetris|skew-simetris|aturan pembentukan/.test(t)) return 'sedang';
   if(kind==='cerita') return 'sedang';
   return 'mudah';
 }
@@ -6469,7 +6358,8 @@ function getTopikSoal(){
   var all=[];
   Object.keys(BANK_SOAL).forEach(function(k){
     BANK_SOAL[k].soal.forEach(function(s){
-      all.push({q:s.q, o:s.o, a:s.a, e:s.e, t:s.t, hots:s.hots, topic:k, subtopic:s.subtopic||inferAdditionalSubtopic(s,k)});
+      var entry={q:s.q, o:s.o, a:s.a, e:s.e, t:s.t, hots:s.hots, topic:k, subtopic:s.subtopic||inferAdditionalSubtopic(s,k), difficulty:s.difficulty||classifyDifficulty(s)};
+      all.push(entry);
     });
   });
   return all;
@@ -6489,117 +6379,194 @@ function getBank(type){
   if(type==='campuran') return topikSoal;
   return BANK_SEKOLAH.concat(topikSoal);
 }
+
+function classifyExamSubtopic(q){
+  var explicit=String(q&&q.subtopic||'').toUpperCase();
+  if(/^(A|B|C|D|E1|E2|E3|F|G1|G2|H1|H2)$/.test(explicit)) return explicit;
+
+  var group=q&&q.topic;
+  if(group && BANK_SOAL[group]) return inferAdditionalSubtopic(q,group);
+
+  var t=String(q&&q.q||'').toLowerCase().replace(/<[^>]*>/g,' ');
+  // Klasifikasi dilakukan berdasarkan konsep utama yang diminta, bukan sekadar
+  // label ujian atau kata umum seperti "matriks".
+  if(/invers|inverse|tidak memiliki invers|matriks singular|matriks nonsingular/.test(t))
+    return /3\s*[×x]\s*3|ordo\s*3|tiga\s*(baris|kolom)/.test(t) ? 'H2' : 'H1';
+  if(/determinan|\bdet\s*\(/.test(t) || /\bdet\b/.test(t))
+    return /3\s*[×x]\s*3|ordo\s*3|sarrus|kofaktor|minor|ekspansi/.test(t) ? 'G2' : 'G1';
+  if(/perkalian skalar|dikali dengan bilangan|kelipatan matriks|k\s*[·.]?\s*a|skalar/.test(t)) return 'E2';
+  if(/perkalian dua matriks|hasil kali|ordo hasil perkalian|ab\s*(?:dan|≠|tidak sama)|ba/.test(t)) return 'E3';
+  if(/penjumlahan|pengurangan|jumlah matriks|selisih matriks/.test(t)) return 'E1';
+  if(/transpos|transpose/.test(t)) return 'C';
+  if(/kesamaan matriks|elemen seletak|nilai\s+[a-z]\s*(?:=|dan)/.test(t)) return 'D';
+  if(/sifat|komutatif|asosiatif|distributif|matriks nol|identitas pada operasi|determinan hasil|transpos hasil/.test(t)) return 'F';
+  if(/jenis matriks|diagonal|simetris|identitas|matriks baris|matriks kolom|matriks persegi/.test(t)) return 'B';
+  return 'A';
+}
+function allocateWeightedTargets(total, keys, weights, capacities){
+  var result={};
+  keys.forEach(function(k){result[k]=0;});
+  var weightSum=keys.reduce(function(s,k){return s+(weights[k]||0);},0)||1;
+  var fractions=[];
+  keys.forEach(function(k){
+    var raw=total*(weights[k]||0)/weightSum;
+    var base=Math.floor(raw);
+    result[k]=Math.min(capacities[k]||0,base);
+    fractions.push({key:k,frac:raw-base,weight:weights[k]||0});
+  });
+  var assigned=keys.reduce(function(s,k){return s+result[k];},0);
+  fractions.sort(function(a,b){return b.frac-a.frac;});
+  while(assigned<total){
+    var available=keys.filter(function(k){return result[k]<(capacities[k]||0);});
+    if(!available.length) break;
+    available.sort(function(a,b){
+      var da=(weights[b]||0)/(result[b]+1), db=(weights[a]||0)/(result[a]+1);
+      return da-db;
+    });
+    var chosen=available[0];
+    result[chosen]++;
+    assigned++;
+  }
+  return result;
+}
 function pickBalancedQuestions(bank,totalCount,alreadyPicked){
   var prior=alreadyPicked||[];
   var levels=['mudah','sedang','sulit'];
+  var levelWeights={mudah:0.30,sedang:0.45,sulit:0.25};
   var groups={mudah:{},sedang:{},sulit:{}};
   var seen={};
-  var topics=[];
-
+  var subtopics=[];
   (bank||[]).forEach(function(q){
     var key=questionIdentityKey(q);
     if(seen[key]) return;
     seen[key]=true;
     var level=classifyDifficulty(q);
-    var topic=classifyExamTopic(q);
-    if(!groups[level][topic]) groups[level][topic]=[];
-    groups[level][topic].push(q);
-    if(topics.indexOf(topic)<0) topics.push(topic);
+    var sub=classifyExamSubtopic(q);
+    if(!groups[level][sub]) groups[level][sub]=[];
+    groups[level][sub].push(q);
+    if(subtopics.indexOf(sub)<0) subtopics.push(sub);
   });
-
+  if(!subtopics.length || totalCount<=prior.length) return [];
+  shuffle(subtopics); // acak pemecah seri agar sisa kuota tidak selalu jatuh ke subtopik yang sama.
   levels.forEach(function(level){
-    Object.keys(groups[level]).forEach(function(topic){shuffle(groups[level][topic]);});
+    Object.keys(groups[level]).forEach(function(sub){shuffle(groups[level][sub]);});
   });
-  if(!topics.length || totalCount<=prior.length) return [];
 
-  // Target tingkat kesulitan: 30% mudah, 45% sedang, dan sisanya sulit.
-  var levelTargets={mudah:Math.round(totalCount*0.30),sedang:Math.round(totalCount*0.45),sulit:0};
+  // Kuota subtopik dibuat setara; bila stok tidak cukup, sisa kuota dialihkan
+  // ke subtopik lain yang masih memiliki soal.
+  var subCapacity={};
+  subtopics.forEach(function(sub){
+    subCapacity[sub]=levels.reduce(function(n,l){return n+(groups[l][sub]||[]).length;},0)
+      +prior.filter(function(q){return classifyExamSubtopic(q)===sub;}).length;
+  });
+  var subWeights={};
+  subtopics.forEach(function(sub){subWeights[sub]=1;});
+  var subTargets=allocateWeightedTargets(totalCount,subtopics,subWeights,subCapacity);
+
+  // Kuota tingkat kesulitan mengikuti 30:45:25. Kekurangan stok pada satu
+  // tingkat dialihkan secara proporsional ke tingkat lain yang masih tersedia.
+  var levelCapacity={};
+  levels.forEach(function(level){
+    levelCapacity[level]=subtopics.reduce(function(n,sub){return n+(groups[level][sub]||[]).length;},0)
+      +prior.filter(function(q){return classifyDifficulty(q)===level;}).length;
+  });
+  var levelTargets={
+    mudah:Math.round(totalCount*0.30),
+    sedang:Math.round(totalCount*0.45),
+    sulit:0
+  };
   levelTargets.sulit=totalCount-levelTargets.mudah-levelTargets.sedang;
-  var levelRemaining={};
+  var levelAssigned=0;
   levels.forEach(function(level){
-    var priorLevel=prior.filter(function(q){return classifyDifficulty(q)===level;}).length;
-    levelRemaining[level]=Math.max(0,levelTargets[level]-priorLevel);
+    levelTargets[level]=Math.min(levelTargets[level],levelCapacity[level]||0);
+    levelAssigned+=levelTargets[level];
   });
+  // Jika stok pada salah satu tingkat tidak cukup, alihkan kuota yang kosong
+  // ke tingkat lain yang masih tersedia dengan tetap mengikuti bobot 30:45:25.
+  while(levelAssigned<totalCount){
+    var availableLevels=levels.filter(function(level){return levelTargets[level]<(levelCapacity[level]||0);});
+    if(!availableLevels.length) break;
+    availableLevels.sort(function(a,b){
+      return (levelWeights[b]/(levelTargets[b]+1))-(levelWeights[a]/(levelTargets[a]+1));
+    });
+    levelTargets[availableLevels[0]]++;
+    levelAssigned++;
+  }
 
-  // Bagi kuota jumlah soal secara merata antartopik. Jika total tidak habis
-  // dibagi rata, selisih satu soal dialokasikan secara acak ke topik berbeda.
-  shuffle(topics);
-  var base=Math.floor(totalCount/topics.length);
-  var remainder=totalCount%topics.length;
-  var topicTargets={},topicRemaining={};
-  topics.forEach(function(topic,i){
-    topicTargets[topic]=base+(i<remainder?1:0);
-    var priorTopic=prior.filter(function(q){return classifyExamTopic(q)===topic;}).length;
-    topicRemaining[topic]=Math.max(0,topicTargets[topic]-priorTopic);
+  var subSelected={},levelSelected={};
+  subtopics.forEach(function(sub){
+    subSelected[sub]=prior.filter(function(q){return classifyExamSubtopic(q)===sub;}).length;
+  });
+  levels.forEach(function(level){
+    levelSelected[level]=prior.filter(function(q){return classifyDifficulty(q)===level;}).length;
   });
 
   var slots=totalCount-prior.length;
   var picked=[];
   var guard=0;
-  while(picked.length<slots && guard<totalCount*topics.length*4){
+  while(picked.length<slots && guard<totalCount*subtopics.length*levels.length*3){
     guard++;
     var candidates=[];
-    topics.forEach(function(topic){
+    subtopics.forEach(function(sub){
       levels.forEach(function(level){
-        var pool=groups[level][topic];
-        if(!pool || !pool.length) return;
-        var tRemain=topicRemaining[topic]||0;
-        var lRemain=levelRemaining[level]||0;
-        // Kombinasi yang memenuhi kedua kuota diprioritaskan. Jika stok soal
-        // tidak memungkinkan, algoritma tetap mengisi dari kelompok tersedia.
-        var priority=(tRemain>0?2:0)+(lRemain>0?2:0)
-          +(tRemain/Math.max(1,topicTargets[topic]))
-          +(lRemain/Math.max(1,levelTargets[level]))+Math.random()*0.01;
-        candidates.push({topic:topic,level:level,priority:priority,pool:pool});
+        var pool=groups[level][sub];
+        if(!pool||!pool.length) return;
+        var sd=(subTargets[sub]||0)-subSelected[sub];
+        var ld=(levelTargets[level]||0)-levelSelected[level];
+        var score=(sd>0?3+sd/Math.max(1,subTargets[sub]):0)
+          +(ld>0?3+ld/Math.max(1,levelTargets[level]):0)
+          +Math.random()*0.001;
+        candidates.push({sub:sub,level:level,pool:pool,score:score,sd:sd,ld:ld});
       });
     });
     if(!candidates.length) break;
-    // Dahulukan pasangan topik dan level yang masih memiliki kuota.
-    // Ini mencegah topik tertentu terambil berlebihan hanya karena stoknya besar.
-    var eligible=candidates.filter(function(c){
-      return (topicRemaining[c.topic]||0)>0 && (levelRemaining[c.level]||0)>0;
-    });
-    if(!eligible.length){
-      // Jika stok tidak memungkinkan memenuhi kuota topik dan level sekaligus,
-      // pertahankan kuota tingkat kesulitan terlebih dahulu.
-      eligible=candidates.filter(function(c){return (levelRemaining[c.level]||0)>0;});
-    }
-    if(!eligible.length){
-      eligible=candidates.filter(function(c){return (topicRemaining[c.topic]||0)>0;});
-    }
-    if(eligible.length) candidates=eligible;
-    candidates.sort(function(a,b){return b.priority-a.priority;});
-    var selected=candidates[0];
-    picked.push(selected.pool.pop());
-    topicRemaining[selected.topic]=(topicRemaining[selected.topic]||0)-1;
-    levelRemaining[selected.level]=(levelRemaining[selected.level]||0)-1;
+    var both=candidates.filter(function(c){return c.sd>0&&c.ld>0;});
+    var eligible=both.length?both:candidates.filter(function(c){return c.ld>0;});
+    if(!eligible.length) eligible=candidates.filter(function(c){return c.sd>0;});
+    if(!eligible.length) eligible=candidates;
+    eligible.sort(function(a,b){return b.score-a.score;});
+    var chosen=eligible[0];
+    var q=chosen.pool.pop();
+    picked.push(q);
+    subSelected[chosen.sub]++;
+    levelSelected[chosen.level]++;
   }
 
-  // Fallback defensif jika sebagian kelompok tidak mempunyai cukup soal.
+  // Jika kombinasi subtopik–kesulitan tertentu tidak tersedia, isi slot dari
+  // stok tersisa. Tidak ada soal yang diulang dalam satu paket.
   while(picked.length<slots){
     var fallback=[];
-    topics.forEach(function(topic){levels.forEach(function(level){
-      var pool=groups[level][topic];
-      if(pool&&pool.length) fallback.push({topic:topic,level:level,pool:pool});
-    });});
+    subtopics.forEach(function(sub){
+      levels.forEach(function(level){
+        var pool=groups[level][sub];
+        if(pool&&pool.length) fallback.push({sub:sub,level:level,pool:pool});
+      });
+    });
     if(!fallback.length) break;
-    shuffle(fallback);
-    var next=fallback[0];
-    picked.push(next.pool.pop());
+    fallback.sort(function(a,b){
+      var da=(subTargets[b.sub]-subSelected[b.sub])+(levelTargets[b.level]-levelSelected[b.level]);
+      var db=(subTargets[a.sub]-subSelected[a.sub])+(levelTargets[a.level]-levelSelected[a.level]);
+      return da-db;
+    });
+    var next=fallback[0], q=next.pool.pop();
+    picked.push(q);
+    subSelected[next.sub]++;
+    levelSelected[next.level]++;
   }
   return shuffle(picked);
 }
+
 function prepQuestion(q){
   var idx=q.o.map((_,i)=>i);
   shuffle(idx);
   return {
     id:q.id || '',
-    q:rapikanTeksSoal(q.q),
+    q:String(q.q || '').trim(),
     o:idx.map(i=>q.o[i]),
     a:idx.indexOf(q.a),
     e:q.e,
     topic:q.topic||classifyExamTopic(q),
-    subtopic:q.subtopic||'',
+    subtopic:classifyExamSubtopic(q),
     difficulty:classifyDifficulty(q)
   };
 }
